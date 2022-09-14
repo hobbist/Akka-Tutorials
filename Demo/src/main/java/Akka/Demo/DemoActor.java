@@ -7,11 +7,9 @@ import akka.japi.pf.ReceiveBuilder;
 public class DemoActor extends AbstractActor {
 	@Override
 	public Receive createReceive() {
-		return ReceiveBuilder.create().match(String.class,new FI.UnitApply<String>() {
-			public void apply(String arg0) throws Exception {
-				System.out.println(arg0);
-				getSender().tell(arg0, getSelf());
-			}
+		return ReceiveBuilder.create().match(String.class, arg0 -> {
+			System.out.println("Received " + arg0);
+			getSender().tell("Acknowledged from Demo "+ arg0, getSelf());
 		}).build();
 	}
 }

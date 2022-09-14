@@ -12,7 +12,7 @@ public class SupervisorChildActor extends AbstractActor {
 	@Override
 	public Receive createReceive() {
 		System.out.println("starting childActor");
-		return receiveBuilder().match(String.class,(str)->{System.out.println(str);throw new NullPointerException();}).
+		return receiveBuilder().match(String.class,(str)-> System.out.println(str)).
 				match(Integer.class, (ints)-> System.out.println(ints)).
 				build();
 	}

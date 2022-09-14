@@ -14,11 +14,12 @@ import scala.concurrent.duration.Duration;
 public class SupervisorActor extends AbstractActor {
 	@Override
 	public void postStop() throws Exception {
-		System.out.println("stooping supervisor actor");
+		System.out.println("Stoping supervisor actor");
 		super.postStop();
 	}
 	public ActorRef childRef;
 	public SupervisorActor() {
+		System.out.println("Creating child Actor for Current Supervisor");
 		childRef=getContext().actorOf(Props.create(SupervisorChildActor.class),"supChildActor");
 	}
 	
@@ -27,27 +28,20 @@ public class SupervisorActor extends AbstractActor {
 		return stratergy;
 	}
 	private static SupervisorStrategy stratergy=new OneForOneStrategy(10, 
-			Duration.create(2,TimeUnit.SECONDS), new Function<Throwable, SupervisorStrategy.Directive>() {
-				@Override
-				public Directive apply(Throwable param) throws Exception {
-					if(param instanceof NullPointerException) {
-						return SupervisorStrategy.restart();
-					}
-					else {
-						return SupervisorStrategy.restart();
-					}
+			Duration.create(2,TimeUnit.SECONDS), param -> {
+				if(param instanceof NullPointerException) {
+					return SupervisorStrategy.restart();
+				}
+				else {
+					return SupervisorStrategy.restart();
 				}
 			}
-			);
+	);
 	
 	@Override
 	public Receive createReceive() {
-		return receiveBuilder().match(String.class, str ->{
-			childRef.tell(str, getSender());
-			//sender().tell(str, getSelf());
-		}).match(Integer.class, ints->{
-			childRef.tell(ints, getSelf());
-		}).	build();
+		System.out.println("Starting Supervisor Actor");
+		return receiveBuilder().match(String.class, str -> childRef.tell(str, getSender())).match(Integer.class, ints-> childRef.tell(ints, getSelf())).build();
 	}
 
 }
